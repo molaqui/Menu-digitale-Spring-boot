@@ -1,14 +1,13 @@
-# Use the JDK 17 base image
+# Stage 1: Build the JAR file
+FROM maven:3.8.5-openjdk-17 AS build
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package
+
+# Stage 2: Build the final Docker image
 FROM eclipse-temurin:17-jdk-alpine
-
-# Add a volume pointing to /tmp
 VOLUME /tmp
-
-# Copy the JAR file to the container
-COPY target/*.jar app.jar
-
-# Expose port 8080
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-
-# Run the jar file
-ENTRYPOINT ["java", "-XX:+EnableDynamicAgentLoading", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-jar", "/app.jar"]
