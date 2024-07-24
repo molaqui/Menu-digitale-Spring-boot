@@ -14,8 +14,5 @@ public class DemoApplication {
         SpringApplication.run(DemoApplication.class, args);
     }
 
-    @Bean
-    public WebServerFactoryCustomizer<TomcatServletWebServerFactory> customizer() {
-        return factory -> factory.setPort(0); // Use 0 to assign a random available port
-    }
+
 }
