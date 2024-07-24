@@ -26,7 +26,7 @@
         <url/>
     </scm>
     <properties>
-        <java.version>21</java.version>
+        <java.version>17</java.version>
     </properties>
     <dependencies>
         <dependency>
@@ -96,10 +96,8 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-               <!-- Make sure this matches your Spring Boot version -->
+                <!-- Make sure this matches your Spring Boot version -->
             </plugin>
-
-
         </plugins>
         <resources>
             <resource>
