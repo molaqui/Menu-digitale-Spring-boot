@@ -8,7 +8,6 @@ VOLUME /tmp
 COPY target/*.jar app.jar
 
 # Expose port 8080
-EXPOSE 8080
 
 # Run the jar file
 ENTRYPOINT ["java", "-XX:+EnableDynamicAgentLoading", "-jar", "/app.jar"]
