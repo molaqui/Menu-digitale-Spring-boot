@@ -1,51 +1,58 @@
 package com.example.demo.Service;
 
-// FoodService.java
 import com.example.demo.DAO.FoodRepository;
-
 import com.example.demo.Entity.Category;
 import com.example.demo.Entity.Food;
+import com.example.demo.Entity.User;
+import com.example.demo.DAO.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class FoodService {
+
     @Autowired
     private FoodRepository foodRepository;
 
     @Autowired
     private CategoryService categoryService;
 
-    public List<Food> getAllFoods() {
-        return foodRepository.findAll();
+    @Autowired
+    private UserRepository userRepository;
+
+    public List<Food> getAllFoods(Long userId) {
+        return foodRepository.findByUserId(userId);
     }
 
-
-        public Food saveFood (Food food){
+    public Food saveFood(Food food, Long userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isPresent()) {
             String categoryName = food.getCategory().getName();
-            Category category = categoryService.findByName(categoryName).get();
-            if (category != null) {
-                food.setCategory(category);
-                return foodRepository.save(food);
-            }
-            throw new RuntimeException("Category not found with Name: " + categoryName);
+            Category category = categoryService.findByName(categoryName, userId).orElseThrow(() -> new RuntimeException("Category not found with Name: " + categoryName));
+            food.setCategory(category);
+            food.setUser(userOptional.get());
+            return foodRepository.save(food);
         }
-
-
-    public List<Food> findByCategoryName(String categoryName) {
-        return foodRepository.findAllByCategoryName(categoryName);
+        throw new RuntimeException("User not found");
     }
 
-    public Optional<Food> findById(Long id) {
-        return foodRepository.findById(id);
+    public List<Food> findByCategoryName(String categoryName, Long userId) {
+        return foodRepository.findAllByCategoryNameAndUserId(categoryName, userId);
     }
 
-
-
-    public void deleteFood(Long id) {
-        foodRepository.deleteById(id);
+    public Optional<Food> findById(Long id, Long userId) {
+        return foodRepository.findByIdAndUserId(id, userId);
     }
 
+    public void deleteFood(Long id, Long userId) {
+        Optional<Food> foodOptional = foodRepository.findByIdAndUserId(id, userId);
+        if (foodOptional.isPresent()) {
+            foodRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Food not found or user does not have permission to delete this food");
+        }
+    }
 }

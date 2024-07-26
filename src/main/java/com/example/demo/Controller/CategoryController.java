@@ -1,6 +1,5 @@
 package com.example.demo.Controller;
 
-// CategoryController.java
 import com.example.demo.DTO.CategoryDTO;
 import com.example.demo.Entity.Category;
 import com.example.demo.Service.CategoryService;
@@ -20,9 +19,9 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
-    @GetMapping
-    public List<CategoryDTO> getAllCategories() {
-        return categoryService.getAllCategories().stream()
+    @GetMapping("/{userId}")
+    public List<CategoryDTO> getAllCategories(@PathVariable Long userId) {
+        return categoryService.getAllCategories(userId).stream()
                 .map(category -> {
                     CategoryDTO newCategory = new CategoryDTO();
                     newCategory.setId(category.getId());
@@ -33,27 +32,23 @@ public class CategoryController {
                 .collect(Collectors.toList());
     }
 
-
-
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadImage(@RequestParam("image") MultipartFile file, @RequestParam("name") String name) {
+    public ResponseEntity<String> uploadImage(@RequestParam("image") MultipartFile file, @RequestParam("name") String name, @RequestParam("userId") Long userId) {
         try {
-            //
             Category category = new Category();
             category.setName(name);
-            category.setImage((file.getBytes()));
-            categoryService.saveCategory(category);
+            category.setImage(file.getBytes());
+            categoryService.saveCategory(category, userId);
             return ResponseEntity.ok("Catégorie et image ajoutées avec succès");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Erreur lors de l'upload de l'image : " + e.getMessage());
         }
     }
 
-    @GetMapping("/names")
-    public List<String> getAllCategoryNames() {
-        return categoryService.getAllCategories().stream()
+    @GetMapping("/names/{userId}")
+    public List<String> getAllCategoryNames(@PathVariable Long userId) {
+        return categoryService.getAllCategories(userId).stream()
                 .map(Category::getName)
                 .collect(Collectors.toList());
     }
-
 }

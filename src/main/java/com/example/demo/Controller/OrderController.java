@@ -1,8 +1,6 @@
 package com.example.demo.Controller;
 
-
 import com.example.demo.Entity.Order;
-import com.example.demo.Enum.Status;
 import com.example.demo.Service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,38 +22,39 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping("/create")
-    public ResponseEntity<Order> createOrder(@RequestBody Order order) {
+    public ResponseEntity<Order> createOrder(@RequestBody Order order, @RequestParam Long userId) {
         logger.info("Received order: {}", order);
-        Order savedOrder = orderService.saveOrder(order);
+        Order savedOrder = orderService.saveOrder(order, userId);
         return ResponseEntity.ok(savedOrder);
     }
 
-    @GetMapping("/table/{tableNumber}")
-    public ResponseEntity<List<Order>> getOrdersByTable(@PathVariable String tableNumber) {
-        List<Order> orders = orderService.getOrdersByTableNumber(tableNumber);
+    @GetMapping("/table/{tableNumber}/{userId}")
+    public ResponseEntity<List<Order>> getOrdersByTable(@PathVariable String tableNumber, @PathVariable Long userId) {
+        List<Order> orders = orderService.getOrdersByTableNumber(tableNumber, userId);
         return ResponseEntity.ok(orders);
     }
 
-    @GetMapping("/delivery")
-    public ResponseEntity<List<Order>> getDeliveryOrders() {
-        List<Order> orders = orderService.getDeliveryOrders();
+    @GetMapping("/delivery/{userId}")
+    public ResponseEntity<List<Order>> getDeliveryOrders(@PathVariable Long userId) {
+        List<Order> orders = orderService.getDeliveryOrders(userId);
         return ResponseEntity.ok(orders);
     }
 
-    @GetMapping("/table")
-    public ResponseEntity<List<Order>> getTableOrders() {
-        List<Order> orders = orderService.getTableOrders();
+    @GetMapping("/table/{userId}")
+    public ResponseEntity<List<Order>> getTableOrders(@PathVariable Long userId) {
+        List<Order> orders = orderService.getTableOrders(userId);
         return ResponseEntity.ok(orders);
     }
+
     @PutMapping("/{orderId}/status")
-    public ResponseEntity<Order> updateOrderStatus(@PathVariable Long orderId, @RequestBody Boolean status) {
-        Order updatedOrder = orderService.updateOrderStatus(orderId, status);
+    public ResponseEntity<Order> updateOrderStatus(@PathVariable Long orderId, @RequestBody Boolean status, @RequestParam Long userId) {
+        Order updatedOrder = orderService.updateOrderStatus(orderId, status, userId);
         return ResponseEntity.ok(updatedOrder);
     }
 
-    @DeleteMapping("/{orderId}")
-    public ResponseEntity<Void> deleteOrder(@PathVariable Long orderId) {
-        orderService.deleteOrder(orderId);
+    @DeleteMapping("/{orderId}/{userId}")
+    public ResponseEntity<Void> deleteOrder(@PathVariable Long orderId, @PathVariable Long userId) {
+        orderService.deleteOrder(orderId, userId);
         return ResponseEntity.noContent().build();
     }
 }

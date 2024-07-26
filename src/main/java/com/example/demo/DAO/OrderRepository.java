@@ -5,8 +5,10 @@ import com.example.demo.Entity.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    List<Order> findByTableNumber(String tableNumber);
-    List<Order> findByOrderType(String orderType);
+    List<Order> findByTableNumberAndUserId(String tableNumber, Long userId);
+    List<Order> findByOrderTypeAndUserId(String orderType, Long userId);
+    Optional<Order> findByIdAndUserId(Long id, Long userId);
 }

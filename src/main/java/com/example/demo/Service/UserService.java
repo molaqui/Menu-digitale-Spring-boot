@@ -1,7 +1,7 @@
 package com.example.demo.Service;
 
-import com.example.demo.Entity.User;
 import com.example.demo.DAO.UserRepository;
+import com.example.demo.Entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -11,7 +11,6 @@ import java.util.Optional;
 
 @Service
 public class UserService {
-
     @Autowired
     private UserRepository userRepository;
 
@@ -44,5 +43,8 @@ public class UserService {
         message.setSubject("Your Password");
         message.setText("Your password is: " + password);
         mailSender.send(message);
+    }
+    public Optional<User> getUserByStoreName(String storeName) {
+        return userRepository.findByStoreName(storeName);
     }
 }

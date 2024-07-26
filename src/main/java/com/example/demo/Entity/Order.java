@@ -1,9 +1,6 @@
 package com.example.demo.Entity;
 
-
-
-
-import com.example.demo.Enum.Status;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -31,9 +28,7 @@ public class Order {
     private String tableNumber;
     private String orderType; // "table" or "delivery"
     private double total;
-
     private boolean status = false; // Default status: false (pending)
-
 
     @JsonIgnoreProperties("order")
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -46,5 +41,8 @@ public class Order {
         }
     }
 
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
+    private User user;
 }

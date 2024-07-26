@@ -1,6 +1,5 @@
 package com.example.demo.Controller;
 
-// FoodController.java
 import com.example.demo.Entity.Category;
 import com.example.demo.Entity.Food;
 import com.example.demo.Service.CategoryService;
@@ -18,16 +17,16 @@ import java.util.Optional;
 @CrossOrigin("*")
 @RequestMapping("/api/foods")
 public class FoodController {
+
     @Autowired
     private FoodService foodService;
+
     @Autowired
     private CategoryService categoryService;
 
-
-
-    @GetMapping
-    public List<Food> getAllFoods() {
-        return foodService.getAllFoods();
+    @GetMapping("/{userId}")
+    public List<Food> getAllFoods(@PathVariable Long userId) {
+        return foodService.getAllFoods(userId);
     }
 
     @PostMapping
@@ -36,9 +35,10 @@ public class FoodController {
             @RequestParam("name") String name,
             @RequestParam("price") Double price,
             @RequestParam("description") String description,
-            @RequestParam("categoryName") String categoryName) {
+            @RequestParam("categoryName") String categoryName,
+            @RequestParam("userId") Long userId) {
         try {
-            Category category = categoryService.findByName(categoryName)
+            Category category = categoryService.findByName(categoryName, userId)
                     .orElseThrow(() -> new RuntimeException("Category not found"));
 
             Food food = new Food();
@@ -48,17 +48,17 @@ public class FoodController {
             food.setImage(file.getBytes());
             food.setCategory(category);
 
-            foodService.saveFood(food);
+            foodService.saveFood(food, userId);
             return ResponseEntity.ok("Food added successfully");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error adding food: " + e.getMessage());
         }
     }
 
-    @GetMapping("/by-category/{categoryName}")
-    public ResponseEntity<List<Food>> getFoodsByCategory(@PathVariable String categoryName) {
+    @GetMapping("/by-category/{categoryName}/{userId}")
+    public ResponseEntity<List<Food>> getFoodsByCategory(@PathVariable String categoryName, @PathVariable Long userId) {
         try {
-            List<Food> foods = foodService.findByCategoryName(categoryName);
+            List<Food> foods = foodService.findByCategoryName(categoryName, userId);
             return ResponseEntity.ok(foods);
         } catch (Exception e) {
             return ResponseEntity.status(404).body(new ArrayList<>());
@@ -72,11 +72,12 @@ public class FoodController {
             @RequestParam("name") String name,
             @RequestParam("price") Double price,
             @RequestParam("description") String description,
-            @RequestParam("categoryName") String categoryName) {
+            @RequestParam("categoryName") String categoryName,
+            @RequestParam("userId") Long userId) {
         try {
-            Category category = categoryService.findByName(categoryName)
+            Category category = categoryService.findByName(categoryName, userId)
                     .orElseThrow(() -> new RuntimeException("Category not found"));
-            Food food = foodService.findById(id)
+            Food food = foodService.findById(id, userId)
                     .orElseThrow(() -> new RuntimeException("Food not found"));
 
             food.setName(name);
@@ -87,27 +88,27 @@ public class FoodController {
             }
             food.setCategory(category);
 
-            foodService.saveFood(food);
+            foodService.saveFood(food, userId);
             return ResponseEntity.ok("Food updated successfully");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error updating food: " + e.getMessage());
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteFood(@PathVariable Long id) {
+    @DeleteMapping("/{id}/{userId}")
+    public ResponseEntity<String> deleteFood(@PathVariable Long id, @PathVariable Long userId) {
         try {
-            foodService.deleteFood(id);
+            foodService.deleteFood(id, userId);
             return ResponseEntity.ok("Food deleted successfully");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error deleting food: " + e.getMessage());
         }
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Food> getFoodById(@PathVariable Long id) {
+    @GetMapping("/{id}/{userId}")
+    public ResponseEntity<Food> getFoodById(@PathVariable Long id, @PathVariable Long userId) {
         try {
-            Optional<Food> food = foodService.findById(id);
+            Optional<Food> food = foodService.findById(id, userId);
             if (food.isPresent()) {
                 return ResponseEntity.ok(food.get());
             } else {
