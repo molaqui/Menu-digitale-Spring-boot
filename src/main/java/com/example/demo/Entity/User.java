@@ -45,4 +45,11 @@ public class User {
     @JsonManagedReference
     @JsonIgnore
     private List<Reservation> reservations;
+
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    @JsonIgnore
+    private List<Chef> chefs; // Add this line
 }
+

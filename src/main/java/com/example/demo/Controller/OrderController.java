@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -47,10 +48,15 @@ public class OrderController {
     }
 
     @PutMapping("/{orderId}/status")
-    public ResponseEntity<Order> updateOrderStatus(@PathVariable Long orderId, @RequestBody Boolean status, @RequestParam Long userId) {
+    public ResponseEntity<Order> updateOrderStatus(
+            @PathVariable Long orderId,
+            @RequestBody Map<String, Boolean> requestBody,
+            @RequestParam Long userId) {
+        Boolean status = requestBody.get("status");
         Order updatedOrder = orderService.updateOrderStatus(orderId, status, userId);
         return ResponseEntity.ok(updatedOrder);
     }
+
 
     @DeleteMapping("/{orderId}/{userId}")
     public ResponseEntity<Void> deleteOrder(@PathVariable Long orderId, @PathVariable Long userId) {

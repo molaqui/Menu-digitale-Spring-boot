@@ -1,7 +1,7 @@
 package com.example.demo.Service;
 
-import com.example.demo.DAO.UserRepository;
 import com.example.demo.Entity.User;
+import com.example.demo.DAO.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -11,19 +11,19 @@ import java.util.Optional;
 
 @Service
 public class UserService {
+
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private JavaMailSender mailSender;
 
-    public boolean login(String email, String password) {
+    public Optional<User> login(String email, String password) {
         Optional<User> userOptional = userRepository.findByEmail(email);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            return user.getPassword().equals(password);
+        if (userOptional.isPresent() && userOptional.get().getPassword().equals(password)) {
+            return userOptional;
         }
-        return false;
+        return Optional.empty();
     }
 
     public boolean forgotPassword(String email) {
@@ -44,7 +44,13 @@ public class UserService {
         message.setText("Your password is: " + password);
         mailSender.send(message);
     }
+
     public Optional<User> getUserByStoreName(String storeName) {
         return userRepository.findByStoreName(storeName);
+    }
+
+    public Optional<String> getWebsiteUrl(Long userId) {
+        Optional<User> user = userRepository.findById(userId);
+        return user.map(User::getWebsiteUrl);
     }
 }
